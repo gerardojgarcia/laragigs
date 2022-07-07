@@ -1,4 +1,4 @@
-@extends('layout')
+<x-layout>
 
 
 
@@ -59,4 +59,4 @@
 </div>
 
 
-@endsection
+</x-layout>
