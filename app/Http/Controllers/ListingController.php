@@ -14,7 +14,7 @@ class ListingController extends Controller
     public function index() {
         
         return view('listings.index', [
-            'listings' => Listing::latest()->filter(request(['tag', 'search']))->get()
+            'listings' => Listing::latest()->filter(request(['tag', 'search']))->paginate(5)
 
         ]);
 
@@ -24,7 +24,7 @@ class ListingController extends Controller
         // show single listings
 
     public function show(Listing $listing) {
-        return view('listing.show', [
+        return view('listings.show', [
             'listing' => $listing
         ]);
 
@@ -41,20 +41,36 @@ class ListingController extends Controller
     // store listing data
 
     public function store(Request $request) {
+       
         $formFields = $request->validate([
             "title" => 'required',
             'company' => ['required', Rule::unique('listings', 'company')],
             'location' => 'required', 
-            'website' => ['required', 'email'],
+            'website' => 'required',
+            'email' => ['required', 'email'],
             'tags' => 'required',
             'description' => 'required'
 
 
         ]);
 
-        return redirect('/');
+
+        if($request->hasFile('logo')) {
+            $formFields['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+
+        Listing::create($formFields);
+
+        
+
+        return redirect('/')->with('message', 'Listing created');
 
     }
 
-    
+    // Show edidt form
+
+    public function edit(Listing $listing) {
+        return view('listing.edit'. ['listing' => $listing]);
+
+    }
 }
